@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Auth — ACM ITU</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#dee7fb;
+    --blue:#5b8ff0;
+    --blue-dark:#3a63c9;
+    --navy:#0f1b3d;
+    --ink:#0a0a0a;
+    --white:#ffffff;
+    --off:#f7f8fb;
+
+    --r-lg:36px;
+    --r-md:28px;
+    --r-sm:20px;
+    --r-btn:22px;
+    --r-icon:18px;
+    --r-pill:999px;
+
+    --clay-white-out:
+        10px 10px 22px rgba(15,27,61,0.14),
+        -8px -8px 18px rgba(255,255,255,0.9);
+    --clay-white-out-sm:
+        6px 6px 14px rgba(15,27,61,0.13),
+        -5px -5px 12px rgba(255,255,255,0.9);
+    --clay-white-in:
+        inset 4px 4px 8px rgba(15,27,61,0.08),
+        inset -4px -4px 8px rgba(255,255,255,0.7);
+    --clay-white-pressed:
+        inset 5px 5px 10px rgba(15,27,61,0.16),
+        inset -4px -4px 8px rgba(255,255,255,0.6);
+
+    --clay-blue-out:
+        10px 10px 22px rgba(58,99,201,0.38),
+        -8px -8px 18px rgba(190,213,255,0.65);
+    --clay-blue-out-sm:
+        6px 6px 13px rgba(58,99,201,0.36),
+        -5px -5px 11px rgba(200,220,255,0.6);
+    --clay-blue-in:
+        inset 4px 4px 9px rgba(20,45,110,0.35),
+        inset -4px -4px 9px rgba(215,232,255,0.55);
+
+    --clay-blue-fill: radial-gradient(130% 170% at 28% -20%,
+        color-mix(in srgb, var(--blue) 30%, white 70%) 0%,
+        color-mix(in srgb, var(--blue) 85%, white 15%) 32%,
+        var(--blue) 60%,
+        var(--blue-dark) 100%);
+    --clay-blue-btn-shadow:
+        0 14px 22px -6px rgba(58,99,201,0.5),
+        0 4px 8px rgba(15,27,61,0.16);
+    --clay-blue-btn-shadow-hover:
+        0 18px 28px -6px rgba(58,99,201,0.55),
+        0 5px 10px rgba(15,27,61,0.18);
+    --clay-blue-btn-shadow-pressed:
+        0 4px 8px -2px rgba(58,99,201,0.4),
+        inset 0 2px 4px rgba(15,27,61,0.25);
+  }
+
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+
+  html, body{
+    height:100%;
+    width:100%;
+  }
+
+  body{
+    font-family:'Nunito', sans-serif;
+    background:
+      radial-gradient(ellipse 80% 60% at 15% 10%, rgba(91,143,240,0.22) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 50% at 85% 90%, rgba(58,99,201,0.18) 0%, transparent 55%),
+      radial-gradient(ellipse 50% 40% at 80% 5%, rgba(180,210,255,0.25) 0%, transparent 50%),
+      linear-gradient(160deg, #dce8fd 0%, #e8effd 40%, #d4e3fb 100%);
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+    position:relative;
+    overflow:hidden;
+  }
+
+  a{ text-decoration:none; color:inherit; }
+
+  /* ── decorative glows (fixed, shared by both views) ── */
+  .glow{
+    position:fixed;
+    border-radius:50%;
+    pointer-events:none;
+    z-index:0;
+  }
+  .glow-1{
+    width:500px; height:500px;
+    background:radial-gradient(circle, rgba(91,143,240,0.20) 0%, transparent 65%);
+    top:-160px; left:-160px;
+    filter:blur(40px);
+  }
+  .glow-2{
+    width:380px; height:380px;
+    background:radial-gradient(circle, rgba(58,99,201,0.15) 0%, transparent 65%);
+    bottom:-120px; right:-120px;
+    filter:blur(40px);
+  }
+  .glow-3{
+    width:280px; height:280px;
+    background:radial-gradient(circle, rgba(140,190,255,0.20) 0%, transparent 65%);
+    top:30%; right:5%;
+    filter:blur(50px);
+  }
+
+  /* ── deco grid ── */
+  .deco-grid{
+    position:fixed;
+    pointer-events:none;
+    z-index:0;
+    width:153px; height:122px;
+    opacity:0.18;
+    overflow:hidden;
+    border-radius:20px;
+    background-image:
+      linear-gradient(var(--blue-dark) 1px, transparent 1px),
+      linear-gradient(90deg, var(--blue-dark) 1px, transparent 1px);
+    background-size:31px 31px;
+    background-position:15px 15px;
+  }
+
+  /* ── deco dots ── */
+  .deco-dots{
+    position:fixed;
+    pointer-events:none;
+    z-index:0;
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:16px;
+  }
+  .deco-dots span{
+    width:6px; height:6px;
+    background:var(--clay-blue-fill);
+    border-radius:50%;
+    display:block;
+    opacity:0.35;
+  }
+
+  /* ── card logo ── */
+  .card-logo{
+    position:absolute;
+    top:-48px;
+    left:50%;
+    transform:translateX(-50%);
+    width:96px; height:96px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:2;
+  }
+
+  .card-logo img{
+    width:150px; height:150px;
+    object-fit:contain;
+    filter:drop-shadow(0 6px 16px rgba(15,27,61,0.22));
+  }
+
+  /* ══════════════════════════════════════════
+     SLIDING VIEWS — each view takes the FULL
+     screen (no extra wrapping "box"); the card
+     itself is what visually slides in/out.
+     ══════════════════════════════════════════ */
+  .view{
+    position:absolute;
+    top:0; left:0;
+    width:100%;
+    height:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+    z-index:1;
+    transition:transform .55s cubic-bezier(.65,0,.35,1), opacity .55s ease;
+  }
+
+  /* default resting states */
+  #view-login{ transform:translateX(0); opacity:1; }
+  #view-signup{ transform:translateX(100%); opacity:0; pointer-events:none; }
+
+  /* state when signup is the active view */
+  body.show-signup #view-login{ transform:translateX(-100%); opacity:0; pointer-events:none; }
+  body.show-signup #view-signup{ transform:translateX(0); opacity:1; pointer-events:auto; }
+
+  /* ── main card (login) ── */
+  .card{
+    position:relative;
+    width:100%;
+    max-width:374px;             /* 440 × 0.85 */
+    background:linear-gradient(155deg, #ffffff 0%, var(--off) 100%);
+    border-radius:var(--r-lg);
+    box-shadow:var(--clay-white-out);
+    padding:50px 37px 37px;      /* more top room for larger logo */
+    margin-top:27px;             /* 32 × 0.85 */
+  }
+
+  /* ── main card (signup) — wider ── */
+  .card-wide{
+    position:relative;
+    width:100%;
+    max-width:640px;             /* wider card */
+    background:linear-gradient(155deg, #ffffff 0%, var(--off) 100%);
+    border-radius:var(--r-lg);
+    box-shadow:var(--clay-white-out);
+    padding:50px 44px 37px;      /* more top room for larger logo */
+    margin-top:27px;             /* 32 × 0.85 */
+  }
+
+  .card-header{
+    text-align:center;
+    margin-bottom:31px;          /* 36 × 0.85 */
+  }
+
+  .card-wide .card-header{
+    margin-bottom:27px;          /* 32 × 0.85 */
+  }
+
+  .card-header h1{
+    font-family:'Fredoka', sans-serif;
+    font-weight:600;
+    font-size:26px;              /* 30 × 0.85 */
+    color:var(--navy);
+    letter-spacing:-0.01em;
+    margin-bottom:7px;           /* 8 × 0.85 */
+  }
+
+  .card-header p{
+    font-size:12px;              /* 14 × 0.85 */
+    color:rgba(15,27,61,0.5);
+    line-height:1.5;
+  }
+
+  /* ── form ── */
+  .form-group{
+    display:flex;
+    flex-direction:column;
+    gap:12px;                    /* 14 × 0.85 */
+    margin-bottom:20px;          /* 24 × 0.85 */
+  }
+
+  .card-wide .form-group{
+    margin-bottom:9px;           /* 10 × 0.85 */
+  }
+
+  /* every row = 2 columns (signup) */
+  .form-row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;                    /* 14 × 0.85 */
+  }
+
+  .form-row.full{
+    grid-template-columns:1fr;
+  }
+
+  .input-wrap{
+    position:relative;
+    display:flex;
+    align-items:center;
+  }
+
+  .input-icon{
+    position:absolute;
+    left:14px;                   /* 16 × 0.85 */
+    color:var(--blue);
+    display:flex;
+    align-items:center;
+    pointer-events:none;
+  }
+
+  .input-icon svg{ width:15px; height:15px; }   /* 18 × 0.85 */
+
+  .input-wrap input,
+  .input-wrap select{
+    width:100%;
+    padding:14px 14px 14px 41px; /* 16/48 × 0.85 */
+    font-family:'Nunito', sans-serif;
+    font-size:13px;              /* 15 × 0.85 */
+    font-weight:600;
+    color:var(--ink);
+    background:linear-gradient(155deg, #ffffff 0%, var(--off) 100%);
+    border:none;
+    border-radius:var(--r-sm);
+    box-shadow:var(--clay-white-in);
+    outline:none;
+    transition:box-shadow .2s ease;
+    appearance:none;
+    -webkit-appearance:none;
+  }
+
+  .input-wrap input::placeholder{
+    color:rgba(15,27,61,0.35);
+    font-weight:600;
+  }
+
+  .input-wrap select{
+    color:rgba(15,27,61,0.5);
+    cursor:pointer;
+  }
+  .input-wrap select.filled{ color:var(--ink); }
+
+  .input-wrap input:focus,
+  .input-wrap select:focus{
+    box-shadow:
+      var(--clay-white-in),
+      0 0 0 3px rgba(91,143,240,0.25);
+  }
+
+  /* ── password toggle ── */
+  .toggle-pw{
+    position:absolute;
+    right:12px;                  /* 14 × 0.85 */
+    background:none;
+    border:none;
+    cursor:pointer;
+    color:rgba(15,27,61,0.35);
+    display:flex;
+    align-items:center;
+    padding:3px;                 /* 4 × 0.85 */
+    transition:color .15s;
+  }
+  .toggle-pw:hover{ color:var(--blue-dark); }
+  .toggle-pw svg{ width:14px; height:14px; }    /* 17 × 0.85 */
+
+  /* ── forgot ── */
+  .forgot-row{
+    display:flex;
+    justify-content:flex-end;
+    margin-top:-5px;             /* 6 × 0.85 */
+    margin-bottom:22px;          /* 26 × 0.85 */
+  }
+
+  .forgot-row a{
+    font-family:'JetBrains Mono', monospace;
+    font-size:9px;               /* 11 × 0.85 */
+    font-weight:700;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    color:var(--blue-dark);
+    transition:opacity .15s;
+  }
+
+  .forgot-row a:hover{ opacity:0.7; }
+
+  /* ── terms (signup) ── */
+  .terms-row{
+    display:flex;
+    align-items:flex-start;
+    gap:10px;                    /* 12 × 0.85 */
+    margin:15px 0 20px;          /* 18/24 × 0.85 */
+  }
+
+  .terms-row input[type="checkbox"]{
+    width:15px; height:15px;     /* 18 × 0.85 */
+    flex-shrink:0;
+    margin-top:2px;
+    accent-color:var(--blue-dark);
+    cursor:pointer;
+  }
+
+  .terms-row label{
+    font-size:11px;              /* 13 × 0.85 */
+    color:rgba(15,27,61,0.55);
+    line-height:1.5;
+    cursor:pointer;
+  }
+
+  .terms-row label a{
+    font-weight:700;
+    color:var(--blue-dark);
+  }
+  .terms-row label a:hover{ opacity:0.7; }
+
+  /* ── submit button ── */
+  .btn-submit{
+    width:100%;
+    padding:15px;                /* 18 × 0.85 */
+    font-family:'JetBrains Mono', monospace;
+    font-weight:700;
+    font-size:12px;               /* 14 × 0.85 */
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    color:#ffffff;
+    text-shadow:0 1px 2px rgba(15,27,61,0.25);
+    background:var(--clay-blue-fill);
+    border:none;
+    border-radius:var(--r-pill);
+    box-shadow:var(--clay-blue-btn-shadow);
+    cursor:pointer;
+    transition:transform .16s ease, box-shadow .16s ease;
+    margin-bottom:24px;          /* 28 × 0.85 */
+  }
+
+  .btn-submit:hover{
+    transform:translateY(-3px);
+    box-shadow:var(--clay-blue-btn-shadow-hover);
+  }
+
+  .btn-submit:active{
+    transform:translateY(0);
+    box-shadow:var(--clay-blue-btn-shadow-pressed);
+  }
+
+  /* ── divider ── */
+  .divider{
+    display:flex;
+    align-items:center;
+    gap:12px;                    /* 14 × 0.85 */
+    margin-bottom:19px;          /* 22 × 0.85 */
+  }
+
+  .divider::before,
+  .divider::after{
+    content:"";
+    flex:1;
+    height:1px;
+    background:rgba(15,27,61,0.1);
+    border-radius:2px;
+  }
+
+  .divider span{
+    font-family:'JetBrains Mono', monospace;
+    font-size:9px;               /* 10 × 0.85 */
+    font-weight:700;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:rgba(15,27,61,0.3);
+  }
+
+  /* ── social login ── */
+  .social-btns{
+    display:flex;
+    gap:10px;                    /* 12 × 0.85 */
+    margin-bottom:26px;          /* 30 × 0.85 */
+  }
+
+  .social-btn{
+    flex:1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:7px;                     /* 8 × 0.85 */
+    padding:11px 14px;           /* 13/16 × 0.85 */
+    font-family:'JetBrains Mono', monospace;
+    font-size:9px;               /* 11 × 0.85 */
+    font-weight:700;
+    letter-spacing:0.05em;
+    text-transform:uppercase;
+    color:var(--navy);
+    background:linear-gradient(155deg, #ffffff 0%, var(--off) 100%);
+    border:none;
+    border-radius:var(--r-sm);
+    box-shadow:var(--clay-white-out-sm);
+    cursor:pointer;
+    transition:transform .15s, box-shadow .15s;
+    text-decoration:none;
+  }
+
+  .social-btn:hover{
+    transform:translateY(-2px);
+    box-shadow:
+      10px 10px 22px rgba(15,27,61,0.16),
+      -8px -8px 18px rgba(255,255,255,0.95);
+  }
+
+  .social-btn svg{ width:14px; height:14px; flex-shrink:0; }   /* 17 × 0.85 */
+
+  /* ── university dropdown ── */
+  .uni-wrap{
+    position:relative;
+    display:flex;
+    flex-direction:column;
+  }
+
+  .uni-arrow{
+    position:absolute;
+    right:12px;
+    top:50%;
+    transform:translateY(-50%);
+    color:rgba(15,27,61,0.35);
+    pointer-events:none;
+    display:flex;
+    align-items:center;
+    transition:transform .2s;
+  }
+  .uni-arrow svg{ width:14px; height:14px; }
+  .uni-wrap.open .uni-arrow{ transform:translateY(-50%) rotate(180deg); }
+
+  .uni-dropdown{
+    display:none;
+    position:absolute;
+    top:calc(100% + 6px);
+    left:0; right:0;
+    background:linear-gradient(155deg, #ffffff 0%, var(--off) 100%);
+    border-radius:var(--r-sm);
+    box-shadow:var(--clay-white-out);
+    z-index:50;
+    max-height:220px;
+    overflow-y:auto;
+    padding:6px 0;
+    scrollbar-width:thin;
+    scrollbar-color:rgba(91,143,240,0.3) transparent;
+  }
+
+  .uni-wrap.open .uni-dropdown{ display:block; }
+
+  .uni-option{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:10px 14px;
+    font-family:'Nunito', sans-serif;
+    font-size:12px;
+    font-weight:700;
+    color:var(--navy);
+    cursor:pointer;
+    transition:background .12s;
+    border-radius:0;
+  }
+
+  .uni-option:hover,
+  .uni-option.highlighted{
+    background:rgba(91,143,240,0.1);
+    color:var(--blue-dark);
+  }
+
+  .uni-option.special{
+    color:var(--blue-dark);
+    border-bottom:1px solid rgba(15,27,61,0.07);
+    margin-bottom:4px;
+    padding-bottom:12px;
+  }
+
+  .uni-option.special svg{
+    width:13px; height:13px;
+    flex-shrink:0;
+    color:var(--blue);
+  }
+
+  .uni-no-results{
+    padding:12px 14px;
+    font-size:12px;
+    color:rgba(15,27,61,0.4);
+    font-style:italic;
+  }
+  .card-footer-text{
+    text-align:center;
+    font-size:11px;              /* 13.5 × 0.85 */
+    color:rgba(15,27,61,0.45);
+  }
+
+  .card-footer-text a{
+    font-weight:700;
+    color:var(--blue-dark);
+    transition:opacity .15s;
+    background:none;
+    border:none;
+    font-family:inherit;
+    font-size:inherit;
+    cursor:pointer;
+  }
+
+  .card-footer-text a:hover{ opacity:0.7; }
+
+  /* ── back link ── */
+  .back-link{
+    position:fixed;
+    top:24px;                    /* 28 × 0.85 */
+    left:24px;                   /* 28 × 0.85 */
+    z-index:10;
+    display:flex;
+    align-items:center;
+    gap:7px;                     /* 8 × 0.85 */
+    padding:9px 15px;            /* 10/18 × 0.85 */
+    font-family:'JetBrains Mono', monospace;
+    font-size:9px;               /* 11 × 0.85 */
+    font-weight:700;
+    letter-spacing:0.07em;
+    text-transform:uppercase;
+    color:var(--navy);
+    background:linear-gradient(155deg, #ffffff 0%, var(--off) 100%);
+    border-radius:var(--r-pill);
+    box-shadow:var(--clay-white-out-sm);
+    transition:transform .15s, box-shadow .15s;
+  }
+
+  .back-link:hover{
+    transform:translateY(-2px);
+    box-shadow:
+      10px 10px 22px rgba(15,27,61,0.16),
+      -8px -8px 18px rgba(255,255,255,0.95);
+  }
+
+  .back-link svg{ width:12px; height:12px; }    /* 14 × 0.85 */
+
+  @media (max-width:560px){
+    .card{ padding:48px 22px 29px; }
+    .card-wide{ padding:48px 20px 28px; }
+    .form-row{ grid-template-columns:1fr; }
+    .back-link{ top:14px; left:14px; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- background glows -->
+  <div class="glow glow-1"></div>
+  <div class="glow glow-2"></div>
+  <div class="glow glow-3"></div>
+
+  <!-- deco grids — top-left and bottom-right only -->
+  <div class="deco-grid" style="top:24px; left:24px;"></div>
+  <div class="deco-grid" style="bottom:24px; right:24px;"></div>
+
+  <!-- dot clusters -->
+  <div class="deco-dots" style="top:110px; right:90px;">
+    <span></span><span></span><span></span><span></span><span></span>
+    <span></span><span></span><span></span><span></span><span></span>
+  </div>
+  <div class="deco-dots" style="bottom:120px; left:80px;">
+    <span></span><span></span><span></span><span></span><span></span>
+    <span></span><span></span><span></span><span></span><span></span>
+  </div>
+
+  <!-- back to home -->
+  <a href="../../index.html" class="back-link">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M5 12l7-7M5 12l7 7"/></svg>
+    Home
+  </a>
+
+  <!-- ══════════ LOGIN VIEW ══════════ -->
+  <div class="view" id="view-login">
+    <div class="card">
+
+      <div class="card-logo">
+        <img src="../../public/ACM_logo.png" alt="ACM logo">
+      </div>
+
+      <div class="card-header">
+        <h1>Welcome back</h1>
+        <p>Enter your credentials to access your account</p>
+      </div>
+
+      <form onsubmit="return false;">
+        <div class="form-group">
+
+          <div class="input-wrap">
+            <span class="input-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 7l10 7 10-7"/></svg>
+            </span>
+            <input type="email" placeholder="Enter your email" autocomplete="email" required>
+          </div>
+
+          <div class="input-wrap">
+            <span class="input-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+            </span>
+            <input type="password" id="pw-login" placeholder="Enter your password" autocomplete="current-password" required>
+            <button type="button" class="toggle-pw" onclick="togglePw('pw-login')" aria-label="Show password">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+
+        </div>
+
+        <div class="forgot-row">
+          <a href="#">Forgot password?</a>
+        </div>
+
+        <button type="submit" class="btn-submit">Sign In</button>
+      </form>
+
+      <p class="card-footer-text">
+        Don't have an account? <a href="#" onclick="showView('signup'); return false;">Sign up</a>
+      </p>
+
+    </div>
+  </div>
+
+  <!-- ══════════ SIGNUP VIEW ══════════ -->
+  <div class="view" id="view-signup">
+    <div class="card-wide">
+
+      <div class="card-logo">
+        <img src="../../public/ACM_logo.png" alt="ACM logo">
+      </div>
+
+      <div class="card-header">
+        <h1>Join ACM</h1>
+        <p>Create your account and become part of the community</p>
+      </div>
+
+      <form onsubmit="return false;">
+        <div class="form-group">
+
+          <!-- row 1: full name + university -->
+          <div class="form-row">
+            <div class="input-wrap">
+              <span class="input-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+              </span>
+              <input type="text" placeholder="Full name" required>
+            </div>
+
+            <!-- university custom dropdown -->
+            <div class="uni-wrap" id="uniWrap">
+              <div class="input-wrap" id="uniInputWrap">
+                <span class="input-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 14v3M12 14v3M16 14v3"/></svg>
+                </span>
+                <input type="text" id="uniInput" placeholder="Select university" autocomplete="off" oninput="filterUni()" onfocus="openUniDrop()" required>
+                <span class="uni-arrow" id="uniArrow">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+                </span>
+              </div>
+              <div class="uni-dropdown" id="uniDropdown"></div>
+              <!-- other input shown when user picks Other -->
+              <div class="input-wrap" id="uniOtherWrap" style="display:none; margin-top:12px;">
+                <span class="input-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z"/></svg>
+                </span>
+                <input type="text" id="uniOtherInput" placeholder="Enter your university name">
+              </div>
+            </div>
+          </div>
+
+          <!-- row 2: email + phone -->
+          <div class="form-row">
+            <div class="input-wrap">
+              <span class="input-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 7l10 7 10-7"/></svg>
+              </span>
+              <input type="email" placeholder="University or Personal email" autocomplete="email" required>
+            </div>
+            <div class="input-wrap">
+              <span class="input-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2A19.79 19.79 0 013.08 4.18 2 2 0 015.06 2h3a2 2 0 012 1.72c.13.96.36 1.9.7 2.81a2 2 0 01-.45 2.11L9.09 9.91a16 16 0 006.99 6.99l1.27-1.27a2 2 0 012.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0122 16.92z"/></svg>
+              </span>
+              <input type="tel" placeholder="Phone number">
+            </div>
+          </div>
+
+          <!-- row 3: password + confirm password -->
+          <div class="form-row">
+            <div class="input-wrap">
+              <span class="input-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+              </span>
+              <input type="password" id="pw-signup" placeholder="Create password" autocomplete="new-password" required>
+              <button type="button" class="toggle-pw" onclick="togglePw('pw-signup')" aria-label="Show password">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+            <div class="input-wrap">
+              <span class="input-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/><path d="M9 16l2 2 4-4"/></svg>
+              </span>
+              <input type="password" id="pw2-signup" placeholder="Confirm password" autocomplete="new-password" required>
+              <button type="button" class="toggle-pw" onclick="togglePw('pw2-signup')" aria-label="Show password">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- terms -->
+        <div class="terms-row">
+          <input type="checkbox" id="terms" required>
+          <label for="terms">I agree to the <a href="../legal/terms.html">Terms of Service</a> and <a href="../legal/privacy.html">Privacy Policy</a> of ACM ITU Student Chapter</label>
+        </div>
+
+        <button type="submit" class="btn-submit">Create Account</button>
+      </form>
+
+      <p class="card-footer-text">
+        Already have an account? <a href="#" onclick="showView('login'); return false;">Sign in</a>
+      </p>
+
+    </div>
+  </div>
+
+<script>
+  function togglePw(id){
+    const el = document.getElementById(id);
+    el.type = el.type === 'password' ? 'text' : 'password';
+  }
+
+  function showView(view){
+    document.body.classList.toggle('show-signup', view === 'signup');
+  }
+
+  /* ══════════ UNIVERSITY DROPDOWN ══════════ */
+
+  const UNIVERSITIES = [
+    'Information Technology University (ITU)',
+    'Quaid-i-Azam University (QAU)',
+    'National University of Sciences & Technology (NUST)',
+    'Lahore University of Management Sciences (LUMS)',
+    'Pakistan Institute of Engineering & Applied Sciences (PIEAS)',
+    'University of the Punjab (PU)',
+    'COMSATS University Islamabad (CUI)',
+    'Aga Khan University (AKU)',
+    'University of Engineering & Technology Lahore (UET Lahore)',
+    'University of Agriculture Faisalabad (UAF)',
+    'Ghulam Ishaq Khan Institute (GIKI)',
+    'FAST National University of Computer & Emerging Sciences (FAST-NUCES)',
+    'NED University of Engineering & Technology (NED)',
+    'Government College University Lahore (GCU Lahore)',
+    'University of Karachi (UoK)',
+    'University of Peshawar (UoP)',
+    'Bahauddin Zakariya University (BZU)',
+    'Institute of Space Technology (IST)',
+    'Institute of Business Administration Karachi (IBA Karachi)',
+    'Air University (AU)',
+    'University of Engineering & Technology Taxila (UET Taxila)',
+    'Government College University Faisalabad (GCUF)',
+    'University of Lahore (UoL)',
+    'University of Veterinary and Animal Sciences (UVAS)',
+    'University of Management and Technology (UMT)',
+    'Bahria University (BU)',
+    'National University of Modern Languages (NUML)',
+    'Riphah International University (RIU)',
+    'University of Sargodha (UoS)',
+    'Habib University (HU)',
+    'University of Engineering & Technology Peshawar (UET Peshawar)',
+    'IBA Sukkur (IBA Sukkur)',
+    'National Textile University (NTU)',
+    'University of Central Punjab (UCP)',
+    'Kinnaird College for Women University (KCWU)',
+    'Lahore College for Women University (LCWU)',
+    'Forman Christian College University (FCCU)',
+    'University of Gujrat (UoG)',
+    'University of Haripur (UoH)',
+    'International Islamic University Islamabad (IIUI)',
+    'Capital University of Science and Technology (CUST)',
+    'University of Malakand (UoM)',
+    'University of Swat (UoSwat)',
+    'University of Sindh (USINDH)',
+    'Mehran University of Engineering & Technology (MUET)',
+    'National University of Technology (NUTECH)',
+    'Superior University (SU)',
+    'Fatima Jinnah Women University (FJWU)',
+    'University of Education Lahore (UE)',
+    'University of Balochistan (UoB)',
+    'Dow University of Health Sciences (DUHS)',
+    'Khyber Medical University (KMU)',
+    'King Edward Medical University (KEMU)',
+    'Fatima Jinnah Medical University (FJMU)',
+    'University of Health Sciences Lahore (UHS)',
+    'Rawalpindi Medical University (RMU)',
+    'Shaheed Zulfiqar Ali Bhutto Medical University (SZABMU)',
+    'Liaquat University of Medical & Health Sciences (LUMHS)',
+    'Bolan University of Medical & Health Sciences (BUMHS)',
+    'University of Azad Jammu and Kashmir (UAJK)',
+    'Karakoram International University (KIU)',
+    'University of Baltistan (UoBA)',
+    'Mirpur University of Science and Technology (MUST)',
+    'University of Kotli AJK (UoKotli)',
+    'University of Poonch Rawalakot (UPR)',
+    'University of Swabi (UoSwabi)',
+    'Abdul Wali Khan University Mardan (AWKUM)',
+    'Hazara University (HU Mansehra)',
+    'Gomal University (GU)',
+    'Kohat University of Science & Technology (KUST)',
+    'University of Chitral (UoC)',
+    'Shaheed Benazir Bhutto Women University Peshawar (SBBWUP)',
+    'University of Turbat (UoT)',
+    'Sardar Bahadur Khan Women\'s University (SBKWU)',
+    'Lasbela University of Agriculture Water and Marine Sciences (LUAWMS)',
+    'Balochistan University of IT Engineering & Management Sciences (BUITEMS)',
+    'University of Larkana (UoLarkana)',
+    'Shah Abdul Latif University (SALU)',
+    'Sukkur IBA University (SIBAУ)',
+    'Benazir Bhutto Shaheed University Lyari (BBSUL)',
+    'Dawood University of Engineering & Technology (DUET)',
+    'Federal Urdu University of Arts Science & Technology (FUUAST)',
+    'Institute of Business Management (IoBM)',
+    'Sir Syed University of Engineering & Technology (SSUET)',
+    'Hamdard University (HamdardU)',
+    'Ziauddin University (ZU)',
+    'Indus University (IU)',
+    'Karachi Institute of Economics & Technology (KIET)',
+    'Jinnah University for Women (JUW)',
+    'Greenwich University Pakistan (GUP)',
+    'Beaconhouse National University (BNU)',
+    'Allama Iqbal Open University (AIOU)',
+    'Virtual University of Pakistan (VU)',
+    'other'
+  ];
+
+  let uniSelected = '';
+
+  /* ── fuzzy match: returns 0–1 score, tolerates typos ── */
+  function fuzzyScore(query, target){
+    const q = query.toLowerCase().trim();
+    const t = target.toLowerCase();
+    if(!q) return 1;
+    if(t.includes(q)) return 1;          // exact substring — highest priority
+
+    // token match: every word in query must partially match some word in target
+    const qWords = q.split(/\s+/);
+    const tWords = t.split(/[\s()&,\/]+/);
+    const allTokensMatch = qWords.every(qw =>
+      tWords.some(tw => tw.startsWith(qw) || tw.includes(qw))
+    );
+    if(allTokensMatch) return 0.9;
+
+    // bigram similarity — handles transpositions and small typos
+    function bigrams(str){ const b=new Set(); for(let i=0;i<str.length-1;i++) b.add(str.slice(i,i+2)); return b; }
+    const qBi = bigrams(q);
+    const tBi = bigrams(t);
+    let inter = 0;
+    qBi.forEach(b => { if(tBi.has(b)) inter++; });
+    const bigramSim = (2 * inter) / (qBi.size + tBi.size + 0.001);
+    if(bigramSim > 0.25) return bigramSim;
+
+    // character coverage: what % of query chars appear in target (order-insensitive)
+    let matched = 0;
+    const tChars = t.split('');
+    for(const c of q){
+      const idx = tChars.indexOf(c);
+      if(idx !== -1){ matched++; tChars.splice(idx,1); }
+    }
+    const coverage = matched / q.length;
+    if(coverage > 0.7) return coverage * 0.6;
+
+    return 0;
+  }
+
+  function buildDropdown(filter){
+    const drop = document.getElementById('uniDropdown');
+    drop.innerHTML = '';
+
+    // Always-top special option
+    const noUni = document.createElement('div');
+    noUni.className = 'uni-option special';
+    noUni.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg> I don't belong to any university`;
+    noUni.onclick = () => selectUni('— No University Affiliation —', false);
+    drop.appendChild(noUni);
+
+    const q = (filter || '').trim();
+
+    // Score and sort all universities
+    const scored = UNIVERSITIES
+      .filter(u => u !== 'other')
+      .map(u => ({ u, score: fuzzyScore(q, u) }))
+      .filter(({ score }) => score > 0)
+      .sort((a, b) => b.score - a.score);
+
+    // Only show results with decent score when user has typed something
+    const list = q === ''
+      ? UNIVERSITIES.filter(u => u !== 'other')
+      : scored.filter(({ score }) => score > 0.18).map(({ u }) => u);
+
+    list.forEach(u => {
+      const el = document.createElement('div');
+      el.className = 'uni-option';
+      el.textContent = u;
+      el.onclick = () => selectUni(u, false);
+      drop.appendChild(el);
+    });
+
+    // Other option at bottom
+    const other = document.createElement('div');
+    other.className = 'uni-option';
+    other.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px;flex-shrink:0;color:var(--blue)"><path d="M12 5v14M5 12h14"/></svg> Other`;
+    other.onclick = () => selectUni('other', true);
+    drop.appendChild(other);
+
+    if(q !== '' && list.length === 0){
+      // clear and show no-results + Other
+      drop.innerHTML = '';
+      drop.appendChild(noUni);
+      const none = document.createElement('div');
+      none.className = 'uni-no-results';
+      none.textContent = 'No close match found — choose "Other" to enter manually';
+      drop.appendChild(none);
+      const otherFallback = document.createElement('div');
+      otherFallback.className = 'uni-option';
+      otherFallback.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px;flex-shrink:0;color:var(--blue)"><path d="M12 5v14M5 12h14"/></svg> Other`;
+      otherFallback.onclick = () => selectUni('other', true);
+      drop.appendChild(otherFallback);
+    }
+  }
+
+  function selectUni(val, isOther){
+    const input = document.getElementById('uniInput');
+    const otherWrap = document.getElementById('uniOtherWrap');
+    const otherInput = document.getElementById('uniOtherInput');
+
+    if(isOther){
+      input.value = 'Other';
+      otherWrap.style.display = 'flex';
+      otherInput.focus();
+    } else {
+      input.value = val;
+      otherWrap.style.display = 'none';
+      otherInput.value = '';
+    }
+    uniSelected = val;
+    closeUniDrop();
+  }
+
+  function openUniDrop(){
+    const wrap = document.getElementById('uniWrap');
+    const input = document.getElementById('uniInput');
+    wrap.classList.add('open');
+    buildDropdown(input.value === 'Other' ? '' : input.value);
+  }
+
+  function closeUniDrop(){
+    document.getElementById('uniWrap').classList.remove('open');
+  }
+
+  function filterUni(){
+    const input = document.getElementById('uniInput');
+    const wrap = document.getElementById('uniWrap');
+    wrap.classList.add('open');
+    buildDropdown(input.value);
+    // reset other if user types again
+    if(input.value !== 'Other'){
+      document.getElementById('uniOtherWrap').style.display = 'none';
+    }
+  }
+
+  // Close dropdown when clicking outside
+  document.addEventListener('click', (e) => {
+    const wrap = document.getElementById('uniWrap');
+    if(wrap && !wrap.contains(e.target)) closeUniDrop();
+  });
+</script>
+</body>
+</html>
+
